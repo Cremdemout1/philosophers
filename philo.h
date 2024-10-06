@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 18:20:43 by ycantin           #+#    #+#             */
-/*   Updated: 2024/09/27 13:11:24 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/05 12:45:34 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,40 +33,40 @@ typedef enum s_status
 
 typedef struct s_fork
 {
-                    pthread_mutex_t lock;   // Mutex for the fork
+            pthread_mutex_t lock;
 }       t_fork;
 
 typedef struct s_philosopher t_philosopher;
 
 typedef struct s_table
 {
-    long             start_time;
-    long             philosopher_num;
-    long             time_to_die;
-    long             time_to_eat;
-    long             time_to_sleep;
-    long             number_of_times_to_eat;
-    long             threads_initiated;
-    int              all_threads_ready;
-    int              end_experiment;
-    pthread_t        observer;
-    t_philosopher    *philo_list;
-    pthread_mutex_t  table_lock;
-    pthread_mutex_t  write_lock;
+    long                    start_time;
+    long                    philosopher_num;
+    long                    time_to_die;
+    long                    time_to_eat;
+    long                    time_to_sleep;
+    long                    number_of_times_to_eat;
+    long                    threads_initiated;
+    int                     all_threads_ready;
+    int                     end_experiment;
+    pthread_t               observer;
+    t_philosopher           *philo_list;
+    pthread_mutex_t         table_lock;
+    pthread_mutex_t         write_lock;
 }   t_table;
 
 typedef struct s_philosopher
 {
-    long             id;                // Philosopher's ID
-    long            last_meal_time;    // Timestamp of the last meal
-    int             full;
-    long            times_eaten;       // How many times the philosopher has eaten
-    t_fork          *left_fork;        // Pointer to the left fork
-    t_fork          *right_fork;       // Pointer to the right fork
-    t_table         *table;            // Reference to shared table data
-    pthread_t       thread;            // Philosopher's thread
-    pthread_mutex_t philo_mutex;
-    struct s_philosopher *next;        // Pointer to the next philosopher (circular linked list)
+    long                    id;
+    long                    last_meal_time;
+    int                     full;
+    long                    times_eaten;
+    t_fork                  *left_fork;
+    t_fork                  *right_fork;
+    t_table                 *table;
+    pthread_t               thread;
+    pthread_mutex_t         philo_mutex;
+    struct s_philosopher    *next;
 }   t_philosopher;
 
 void    init_experiment(t_table *table);
@@ -75,9 +75,18 @@ void    initiate_threads(t_philosopher **philosophers);
 void    *observe_experiment(void *phil);
 void    join_threads(t_philosopher **philosopher);
 void    erase_group(t_philosopher **group);
-int get_time(void);
 
+int     get_time(void);int check_if_full(t_philosopher *philo);
+int     is_dead(t_philosopher *philo);
+int     sim_end(t_table *table);
+void    _usleep(unsigned long long time, t_philosopher *philo);
+void    eat(t_philosopher *philo);
 
+void    write_status(t_status status, t_philosopher *philo);
+void    set_long(pthread_mutex_t *mutex, long *var, long value);
+int     get_long(pthread_mutex_t *mutex, long *value);
+void    set_int(pthread_mutex_t *mutex, int *var, int value);
+int     get_int(pthread_mutex_t *mutex, int *value);
 
 #endif
 

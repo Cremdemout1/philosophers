@@ -6,7 +6,7 @@
 #    By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/26 18:20:43 by ycantin           #+#    #+#              #
-#    Updated: 2024/09/25 14:02:17 by ycantin          ###   ########.fr        #
+#    Updated: 2024/10/05 11:53:49 by ycantin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,8 @@ DEPENDENCIES = -pthread
 SRC  = 	main.c \
 		create_philosophers.c \
 		threads.c \
+		threads_utils.c \
+		mutex_safety.c
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
