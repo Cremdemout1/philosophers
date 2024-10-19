@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/05 12:19:11 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/19 16:00:17 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,17 +46,19 @@ void init_experiment(t_table *table)
 		exit(1);
 	}
 	philo = NULL;
-	create_philosophers(table, &philo);
-	if (!philo)
+	if (create_philosophers(table, &philo) == 0)
 	{
-		printf("Failed to create philo\n");
-		exit(1);
+		if (!philo)
+		{
+			printf("Failed to create philo\n");
+			exit(1);
+		}
+		table->philo_list = philo;
+		initiate_threads(&philo);
+		pthread_create(&table->observer, NULL, observe_experiment, philo);
+		join_threads(&philo);
+		pthread_join(table->observer, NULL);
 	}
-	table->philo_list = philo;
-	initiate_threads(&philo);
-	pthread_create(&table->observer, NULL, observe_experiment, philo);
-	join_threads(&philo);
-	pthread_join(table->observer, NULL);
 	pthread_mutex_destroy(&table->table_lock);
 	erase_group(&philo);
 }
@@ -87,7 +89,6 @@ int main(int argc, char **argv)
 		free(table);
 		return (printf("Invalid given time. Please give a value over 60 milliseconds\n"), 1);
 	}
-		
 	if (argc == 6)
 	{
 		table->number_of_times_to_eat = atoi(argv[5]);

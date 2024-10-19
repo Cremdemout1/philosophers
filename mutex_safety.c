@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/05 12:20:42 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/19 15:35:19 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,12 @@ void	write_status(t_status status, t_philosopher *philo)
 	time_passed = get_time() - philo->table->start_time;
 	if ((status == FORK1 || status == FORK2) && !philo->table->end_experiment)
 		printf("%ld %ld has taken a fork\n", time_passed, philo->id);
+	
+	// if ((status == FORK2) && !philo->table->end_experiment)
+	// 	printf("%ld %ld has taken a fork left\n", time_passed, philo->id);
+	// if ((status == FORK1) && !philo->table->end_experiment)
+	// 	printf("%ld %ld has taken a fork right\n", time_passed, philo->id);
+		
 	else if (status == EATING && !philo->table->end_experiment)
 		printf("%ld %ld is eating\n", time_passed, philo->id); 
 	else if (status == SLEEPING && !philo->table->end_experiment)

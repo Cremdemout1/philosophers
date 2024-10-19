@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/06 17:44:04 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/19 15:58:33 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,14 @@ void	connect_forks(t_philosopher **group)
 	first->left_fork = current->right_fork;
 }
 
-void	create_philosophers(t_table *table, t_philosopher **group)
+void	single_philo(t_philosopher *philo)
+{
+	write_status(FORK1, philo);
+	usleep(philo->table->time_to_die * 1000);
+	write_status(DEAD, philo);
+}
+
+int	create_philosophers(t_table *table, t_philosopher **group)
 {
 	int i;
 	t_philosopher *philosopher;
@@ -104,7 +111,13 @@ void	create_philosophers(t_table *table, t_philosopher **group)
 		add_to_group(group, philosopher);
 		i++;
 	}
+	if (table->philosopher_num == 1)
+	{
+		single_philo(*group);
+		return (1);
+	}
 	connect_forks(group);
+	return (0);	
 }
 
 int get_time(void)
@@ -113,6 +126,3 @@ int get_time(void)
 	gettimeofday(&t, NULL);
 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }
-
-
-// NEW_PHILO IS ACC THE GIT REPO. MAKE PHILO_GIT THE GIT REPO SINCE IVE WORKED ON IT. OR JUST COPY FILES TO NEW PHILO

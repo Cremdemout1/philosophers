@@ -6,103 +6,100 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/05 12:43:21 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/19 18:58:43 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "philo.h"
 
 void *philosopher_routine(void *arg)
 {
-	t_philosopher *philo;
-		
-	philo = (t_philosopher *)arg;
-		
-	//all_threads_ready(philo);
-	//set_long(&philo->table->table_lock, &philo->table->start_time, get_time());
-		
-	//set last meal time
-	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time());
-	//increase threads initiated
-	pthread_mutex_lock(&philo->table->table_lock);
-	philo->table->threads_initiated++;
-	pthread_mutex_unlock(&philo->table->table_lock);
-	while (!sim_end(philo->table))
-	{
-		if(get_int(&philo->philo_mutex, &philo->full))  //for optimization purposes
-		{
-			printf("\033[1;32m%ld %ld is full\033[0m\n", get_time() - philo->table->start_time, philo->id);
-			break ;
-		}
-		eat(philo);
-		if(get_int(&philo->philo_mutex, &philo->full))
-		{
-			printf("\033[1;32m%ld %ld is full\033[0m\n", get_time() - philo->table->start_time, philo->id);
-			break ;
-		}
-		write_status(SLEEPING, philo);
-		_usleep(philo->table->time_to_sleep, philo);
-		write_status(THINKING, philo);
-	}
-	return (NULL);
+    t_philosopher *philo;
+    
+    philo = (t_philosopher *)arg;
+
+    pthread_mutex_lock(&philo->table->table_lock);
+    philo->table->threads_initiated++;
+    pthread_mutex_unlock(&philo->table->table_lock);
+    
+    // waiting until all philos are ready makes deadlocks more probable |
+    //                                                                  V
+    // while (get_long(&philo->table->table_lock, &philo->table->threads_initiated) < philo->table->philosopher_num)
+    //     usleep(100);
+    
+    while (!sim_end(philo->table))
+    {
+        if (get_int(&philo->philo_mutex, &philo->full))  // For optimization purposes
+        {
+            break ;
+        }
+        eat(philo); // Philosopher tries to eat
+        if (get_int(&philo->philo_mutex, &philo->full))
+        {
+            break ;
+        }
+        write_status(SLEEPING, philo);
+        _usleep(philo->table->time_to_sleep, philo);
+        write_status(THINKING, philo);
+    }
+    return (NULL);
 }
-
-// void init_even(t_philosopher *current)
-// {
-//   while (current)
-//   {
-//	 if (current->id % 2 == 0)
-//	 {
-//	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
-//	   {
-//		 perror("Failed to create thread");
-//		 return ;
-//	   }
-//	 }
-//	 current = current->next;
-//   }
-// }
-
-// void init_odd(t_philosopher *current)
-// {
-//   while (current)
-//   {
-//	 if (current->id % 2 == 1)
-//	 {
-//	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
-//	   {
-//		 perror("Failed to create thread");
-//		 return ;
-//	   }
-//	 }
-//	 current = current->next;
-//   }
-// }
 
 // void initiate_threads(t_philosopher **philosophers)
 // {
-//   t_philosopher *current;
-//   current = *philosophers;
-//   init_even(current);
-//   usleep(50);
-//   init_odd(current);
+// 	t_philosopher *current;
+
+// 	current = *philosophers;
+// 	while (current)
+// 	{
+// 		if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
+// 		{
+// 			perror("Failed to create thread");
+// 			return ;
+// 		}
+// 		current = current->next;
+// 	}
 // }
+
+void init_even(t_philosopher *current)
+{
+  while (current)
+  {
+	 if (current->id % 2 == 0)
+	 {
+	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
+	   {
+		 perror("Failed to create thread");
+		 return ;
+	   }
+	 }
+	 current = current->next;
+  }
+}
+
+void init_odd(t_philosopher *current)
+{
+  while (current)
+  {
+	 if (current->id % 2 == 1)
+	 {
+	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
+	   {
+		 perror("Failed to create thread");
+		 return ;
+	   }
+	 }
+	 current = current->next;
+  }
+}
 
 void initiate_threads(t_philosopher **philosophers)
 {
-	t_philosopher *current;
-
-	current = *philosophers;
-	while (current)
-	{
-		if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
-		{
-			perror("Failed to create thread");
-			return ;
-		}
-		current = current->next;
-	}
+  t_philosopher *current;
+  current = *philosophers;
+  init_even(current);
+  usleep(50);
+  init_odd(current);
 }
 
 void	join_threads(t_philosopher **philosopher)
@@ -138,7 +135,6 @@ int observation_round(t_table *table)
     }
     if (all_full)
     {
-        printf("\033[1;30m%ld everyone is full\033[0m\n", get_time() - table->start_time);
         set_int(&table->table_lock, &table->end_experiment, 1);
         return (1);
     }
@@ -158,7 +154,7 @@ void *observe_experiment(void *phil)
         initiated = get_long(&table->table_lock, &table->threads_initiated);
         if (initiated == table->philosopher_num)
             break;
-        usleep(50);
+        usleep(100);
     }
     while (!sim_end(table))
     {

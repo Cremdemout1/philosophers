@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 18:20:43 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/05 12:45:34 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/19 14:27:38 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ typedef struct s_philosopher
 }   t_philosopher;
 
 void    init_experiment(t_table *table);
-void    create_philosophers(t_table *table, t_philosopher **group);
+int     create_philosophers(t_table *table, t_philosopher **group);
 void    initiate_threads(t_philosopher **philosophers);
 void    *observe_experiment(void *phil);
 void    join_threads(t_philosopher **philosopher);
