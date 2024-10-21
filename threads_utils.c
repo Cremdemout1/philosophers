@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/19 17:15:59 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/21 15:21:38 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,51 @@ int	check_if_full(t_philosopher *philo)
 	return (0);
 }
 
-void eat(t_philosopher *philo)
+void	grab_forks(t_philosopher *philo)
+{
+	while (!is_dead(philo))
+	{
+		pthread_mutex_lock(&philo->left_fork->lock);
+		if (philo->left_fork->locked == false)
+		{
+			philo->left_fork->locked = true;
+			pthread_mutex_unlock(&philo->left_fork->lock);
+			write_status(FORK1, philo);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->left_fork->lock);
+	}
+	while (!is_dead(philo))
+	{
+		pthread_mutex_lock(&philo->right_fork->lock);
+		if (philo->right_fork->locked == false)
+		{
+			philo->right_fork->locked = true;
+			pthread_mutex_unlock(&philo->right_fork->lock);
+			write_status(FORK1, philo);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->right_fork->lock);
+	}
+}
+
+void	drop_forks(t_philosopher *philo)
 {
 	pthread_mutex_lock(&philo->left_fork->lock);
-	write_status(FORK1, philo);
+	philo->left_fork->locked = false;
+	pthread_mutex_unlock(&philo->left_fork->lock);
 	pthread_mutex_lock(&philo->right_fork->lock);
-	write_status(FORK2, philo);
+	philo->right_fork->locked = false;
+	pthread_mutex_unlock(&philo->right_fork->lock);
+}
+
+void eat(t_philosopher *philo)
+{
+	// pthread_mutex_lock(&philo->left_fork->lock);
+	// write_status(FORK1, philo);
+	// pthread_mutex_lock(&philo->right_fork->lock);
+	// write_status(FORK2, philo);
+	grab_forks(philo);
 	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time());
 	pthread_mutex_lock(&philo->philo_mutex);
 	philo->times_eaten++;
@@ -69,14 +108,7 @@ void eat(t_philosopher *philo)
 	_usleep(philo->table->time_to_eat, philo);
 	if (philo->table->number_of_times_to_eat > 0 && philo->times_eaten >= philo->table->number_of_times_to_eat)
 		set_int(&philo->philo_mutex, &philo->full, 1);
-	// if (philo->id % 2 == 0)
-	// {
-	pthread_mutex_unlock(&philo->right_fork->lock);
-	pthread_mutex_unlock(&philo->left_fork->lock);
-	// }
-	// else
-	// {
-	// pthread_mutex_unlock(&philo->left_fork->lock);
 	// pthread_mutex_unlock(&philo->right_fork->lock);
-	// }
+	// pthread_mutex_unlock(&philo->left_fork->lock);
+	drop_forks(philo);
 }

@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 18:20:43 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/19 14:27:38 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/21 15:36:22 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef enum s_status
 
 typedef struct s_fork
 {
+            bool            locked;
             pthread_mutex_t lock;
 }       t_fork;
 
@@ -61,6 +62,7 @@ typedef struct s_philosopher
     long                    last_meal_time;
     int                     full;
     long                    times_eaten;
+    long                    thinking_time;
     t_fork                  *left_fork;
     t_fork                  *right_fork;
     t_table                 *table;

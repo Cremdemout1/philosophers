@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/19 16:00:17 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/21 16:29:56 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,28 @@ void	erase_group(t_philosopher **group)
 	*group = NULL;
 }
 
+
+int	ft_atoi(const char *str)
+{
+	int	i;
+	int	sign;
+	int	result;
+
+	i = 0;
+	sign = 1;
+	result = 0;
+	while (str[i] == 32 || (str[i] <= 13 && str[i] >= 9))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			sign = -1;
+		i++;
+	}
+	while (str[i] <= 57 && str[i] >= 48)
+		result = (result * 10) + (str[i++] - 48);
+	return (result * sign);
+}
 
 void init_experiment(t_table *table)
 {
@@ -75,10 +97,10 @@ int main(int argc, char **argv)
 	table = malloc(sizeof(t_table));
 	if (!table)
 		return (perror("Failed to allocate memory for table"), 1);
-	table->philosopher_num = atoi(argv[1]);
-	table->time_to_die = atoi(argv[2]);
-	table->time_to_eat = atoi(argv[3]);
-	table->time_to_sleep = atoi(argv[4]);
+	table->philosopher_num = ft_atoi(argv[1]);
+	table->time_to_die = ft_atoi(argv[2]);
+	table->time_to_eat = ft_atoi(argv[3]);
+	table->time_to_sleep = ft_atoi(argv[4]);
 	table->start_time = get_time();
 	table->threads_initiated = 0;
 	table->end_experiment = 0;

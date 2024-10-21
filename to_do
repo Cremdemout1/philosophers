@@ -5,5 +5,8 @@
 					   V		
 FIX FOR DEADLOCKS: REMOVED WAIT UNTIL ALL PHILOS INITED AND REMOVED FORK PICK DISCRIMINATION
 ADDS: INITIATING PHILOSOPHERS EVEN BEFORE ODD (INITIATION DISCRIMINATION)
+ERROR: my current approach has deadlocks 21/10/2024 
+								V
+fix: implemented beas idea of thinking being certain lengths as well as creating my own trylock function
 
 - protect "" and "   " and such

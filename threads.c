@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/19 18:58:43 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/21 16:41:58 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,85 +22,79 @@ void *philosopher_routine(void *arg)
     philo->table->threads_initiated++;
     pthread_mutex_unlock(&philo->table->table_lock);
     
-    // waiting until all philos are ready makes deadlocks more probable |
-    //                                                                  V
-    // while (get_long(&philo->table->table_lock, &philo->table->threads_initiated) < philo->table->philosopher_num)
-    //     usleep(100);
-    
+    if (philo->id % 2 == 0)
+        usleep(10000);
     while (!sim_end(philo->table))
     {
         if (get_int(&philo->philo_mutex, &philo->full))  // For optimization purposes
-        {
             break ;
-        }
         eat(philo); // Philosopher tries to eat
         if (get_int(&philo->philo_mutex, &philo->full))
-        {
             break ;
-        }
         write_status(SLEEPING, philo);
         _usleep(philo->table->time_to_sleep, philo);
         write_status(THINKING, philo);
+        _usleep(philo->thinking_time, philo);
     }
     return (NULL);
 }
 
-// void initiate_threads(t_philosopher **philosophers)
-// {
-// 	t_philosopher *current;
-
-// 	current = *philosophers;
-// 	while (current)
-// 	{
-// 		if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
-// 		{
-// 			perror("Failed to create thread");
-// 			return ;
-// 		}
-// 		current = current->next;
-// 	}
-// }
-
-void init_even(t_philosopher *current)
-{
-  while (current)
-  {
-	 if (current->id % 2 == 0)
-	 {
-	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
-	   {
-		 perror("Failed to create thread");
-		 return ;
-	   }
-	 }
-	 current = current->next;
-  }
-}
-
-void init_odd(t_philosopher *current)
-{
-  while (current)
-  {
-	 if (current->id % 2 == 1)
-	 {
-	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
-	   {
-		 perror("Failed to create thread");
-		 return ;
-	   }
-	 }
-	 current = current->next;
-  }
-}
-
 void initiate_threads(t_philosopher **philosophers)
 {
-  t_philosopher *current;
-  current = *philosophers;
-  init_even(current);
-  usleep(50);
-  init_odd(current);
+	t_philosopher *current;
+
+	current = *philosophers;
+	while (current)
+	{
+		if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
+		{
+			perror("Failed to create thread");
+			return ;
+		}
+		current = current->next;
+	}
 }
+
+// void init_even(t_philosopher *current)
+// {
+//   while (current)
+//   {
+// 	 if (current->id % 2 == 0)
+// 	 {
+// 	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
+// 	   {
+// 		 perror("Failed to create thread");
+// 		 return ;
+// 	   }
+// 	 }
+// 	 current = current->next;
+//   }
+// }
+
+// void init_odd(t_philosopher *current)
+// {
+//   while (current)
+//   {
+// 	 if (current->id % 2 == 1)
+// 	 {
+// 	   if (pthread_create(&current->thread, NULL, &philosopher_routine, current) != 0)
+// 	   {
+// 		 perror("Failed to create thread");
+// 		 return ;
+// 	   }
+// 	 }
+// 	 current = current->next;
+//   }
+// }
+
+// void initiate_threads(t_philosopher **philosophers)
+// {
+//   t_philosopher *current;
+//   current = *philosophers;
+//   init_even(current);
+//   usleep(50);
+//   init_odd(current);
+// }
 
 void	join_threads(t_philosopher **philosopher)
 {

@@ -6,7 +6,7 @@
 /*   By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 11:49:50 by ycantin           #+#    #+#             */
-/*   Updated: 2024/10/19 15:58:33 by ycantin          ###   ########.fr       */
+/*   Updated: 2024/10/21 16:42:24 by ycantin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,18 @@ t_philosopher	*initialize_philosopher(t_table *table, int i)
 	philosopher->times_eaten = 0;
 	philosopher->table = table;
 	philosopher->thread = 0;
+	if (table->philosopher_num % 2 == 0)
+		philosopher->thinking_time = table->time_to_eat - table->time_to_sleep;
+	else
+	{
+		if (philosopher->id % 2 == 0 && table->time_to_eat > table->time_to_sleep)
+			philosopher->thinking_time = table->time_to_eat - table->time_to_sleep;
+		else
+			philosopher->thinking_time = table->time_to_eat * 2 - table->time_to_sleep;
+		if (philosopher->thinking_time < 0)
+			philosopher->thinking_time = 0;
+	}
+	
 	philosopher->right_fork = malloc(sizeof(t_fork));
 	if (!philosopher->right_fork)
 	{
@@ -35,6 +47,7 @@ t_philosopher	*initialize_philosopher(t_table *table, int i)
 		exit(EXIT_FAILURE);
 	}
 	pthread_mutex_init(&philosopher->right_fork->lock, NULL);
+	philosopher->right_fork->locked = false;
 	pthread_mutex_init(&philosopher->philo_mutex, NULL);
 	philosopher->left_fork = NULL;
 	philosopher->next = NULL;

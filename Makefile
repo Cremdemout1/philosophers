@@ -6,14 +6,14 @@
 #    By: ycantin <ycantin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/26 18:20:43 by ycantin           #+#    #+#              #
-#    Updated: 2024/10/05 11:53:49 by ycantin          ###   ########.fr        #
+#    Updated: 2024/10/21 16:06:59 by ycantin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philosophers
 CC = cc
-FLAGS = -Wall -Wextra -Werror
 TSAN_FLAGS = -fsanitize=thread
+FLAGS = -Wall -Wextra -Werror -g 
 RM = rm -f
 DEPENDENCIES = -pthread
 
@@ -32,11 +32,8 @@ RESET = \033[0m
 
 all: $(NAME)
 
-tsan: FLAGS += $(TSAN_FLAGS)
-tsan: clean $(NAME)
-
 $(NAME): $(LIBFT) $(SRC)
-	@$(CC) $(FLAGS) $(SRC)  -o $(NAME) $(DEPENDENCIES)
+	@$(CC) $(FLAGS) $(SRC) -o $(NAME) $(DEPENDENCIES)
 	@echo $(NAME) ready
 	@echo "$(CYAN)Usage:$(RESET) ./$(NAME) $(GREEN)<num_philosophers>$(RESET) $(YELLOW)<time_to_die>$(RESET) $(MAGENTA)<time_to_eat>$(RESET) $(BLUE)<time_to_sleep>$(RESET) $(RED)[num_meals]$(RESET)"
 	@echo "$(GREEN)- <num_philosophers>: Number of philosophers at the table.$(RESET)"
